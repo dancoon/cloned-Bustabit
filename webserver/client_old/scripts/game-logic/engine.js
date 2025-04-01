@@ -26,6 +26,8 @@ define([
 
         self.ws = io(AppConstants.Engine.HOST);
 
+        console.log(self.ws)
+
         /** The engine is connected to the server, if not connected, all fields are unreadable */
         self.isConnected = false;
 

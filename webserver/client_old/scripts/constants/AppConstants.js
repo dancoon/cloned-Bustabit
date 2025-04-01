@@ -1,5 +1,7 @@
 define(['lib/key-mirror'], function(KeyMirror){
 
+    console.log("WINDOW LOCATION", window.document.location.host.replace(/:3841$/, ':3842'))
+
     return {
 
         ActionTypes: KeyMirror({

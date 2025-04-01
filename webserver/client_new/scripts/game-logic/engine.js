@@ -5,7 +5,7 @@ define([
     'game-logic/clib',
     'constants/AppConstants',
     'dispatcher/AppDispatcher'
-], function(
+], function (
     io,
     Events,
     _,
@@ -150,7 +150,7 @@ define([
         /**
          * Event called at the moment when the game starts
          */
-        self.ws.on('game_started', function(bets) {
+        self.ws.on('game_started', function (bets) {
             self.joined = [];
 
             self.gameState = 'IN_PROGRESS';
@@ -165,11 +165,11 @@ define([
 
             //Create the player info object with bet and username
             //If you are in the bets rest your bet from your balance
-            Object.keys(bets).forEach(function(username) {
+            Object.keys(bets).forEach(function (username) {
                 if (self.username === username)
                     self.balanceSatoshis -= bets[username];
 
-                self.playerInfo[username] = { bet: bets[username], username: username };
+                self.playerInfo[username] = {bet: bets[username], username: username};
             });
 
             self.calcBonuses();
@@ -181,26 +181,26 @@ define([
          * Event called each 150ms telling the client the game is still alive
          * @param {number} data - elapsed time
          */
-        self.ws.on('game_tick', function(elapsed) {
+        self.ws.on('game_tick', function (elapsed) {
             /** Time of the last tick received */
             self.lastGameTick = Date.now();
-            if(self.lag === true){
+            if (self.lag === true) {
                 self.lag = false;
                 self.trigger('lag_change');
             }
 
             /** Correct the time of startTime every gameTick **/
             var currentLatencyStartTime = self.lastGameTick - elapsed;
-            if(self.startTime>currentLatencyStartTime)
+            if (self.startTime > currentLatencyStartTime)
                 self.startTime = currentLatencyStartTime;
 
-            if(self.tickTimer)
+            if (self.tickTimer)
                 clearTimeout(self.tickTimer);
 
             self.tickTimer = setTimeout(self.checkForLag.bind(self), AppConstants.Engine.STOP_PREDICTING_LAPSE);
 
             //Check for animation triggers
-            if(elapsed > AppConstants.Animations.NYAN_CAT_TRIGGER_MS && !self.nyan) {
+            if (elapsed > AppConstants.Animations.NYAN_CAT_TRIGGER_MS && !self.nyan) {
                 self.nyan = true;
                 self.trigger('nyan_cat_animation');
             }
@@ -208,13 +208,13 @@ define([
         });
 
         /** Socket io errors */
-        self.ws.on('error', function(x) {
+        self.ws.on('error', function (x) {
             console.log('on error: ', x);
             self.trigger('error', x);
         });
 
         /** Server Errors */
-        self.ws.on('err', function(err) {
+        self.ws.on('err', function (err) {
             console.error('Server sent us the error: ', err);
         });
 
@@ -226,13 +226,13 @@ define([
          * @param {object} data.bonuses - List of bonuses of each user, in satoshis
          * @param {string} data.hash - Revealed hash of the game
          */
-        self.ws.on('game_crash', function(data) {
+        self.ws.on('game_crash', function (data) {
 
-            if(self.tickTimer)
+            if (self.tickTimer)
                 clearTimeout(self.tickTimer);
 
             //If the game crashed at zero x remove bonuses projections by setting them to zero.
-            if(data.game_crash == 0)
+            if (data.game_crash == 0)
                 self.setBonusesToZero();
 
             //Update your balance if you won a bonus, use this one because its the bonus rounded by the server
@@ -278,7 +278,7 @@ define([
          * @param {number} info.game_id - The next game id
          * @param {number} info.time_till_start - Time lapse for the next game to begin
          */
-        self.ws.on('game_starting', function(info) {
+        self.ws.on('game_starting', function (info) {
             self.playerInfo = {};
             self.joined = [];
 
@@ -290,8 +290,8 @@ define([
 
             // Every time the game starts checks if there is a queue bet and send it
             if (self.nextBetAmount) {
-                self.doBet(self.nextBetAmount, self.nextAutoCashout, function(err) {
-                    if(err)
+                self.doBet(self.nextBetAmount, self.nextAutoCashout, function (err) {
+                    if (err)
                         console.log('Response from placing a bet: ', err);
                 });
             }
@@ -306,7 +306,7 @@ define([
          * @param {string} resp.username - The player username
          * @param {number} resp.bet - The player bet in satoshis
          */
-        self.ws.on('player_bet', function(data) {
+        self.ws.on('player_bet', function (data) {
             if (self.username === data.username) {
                 self.placingBet = false;
                 self.nextBetAmount = null;
@@ -326,7 +326,7 @@ define([
          * @param {string} resp.username - The player username
          * @param {number} resp.stopped_at -The percentage at which the user cashed out
          */
-        self.ws.on('cashed_out', function(resp) {
+        self.ws.on('cashed_out', function (resp) {
             //Add the cashout percentage of each user at cash out
             if (!self.playerInfo[resp.username])
                 return console.warn('Username not found in playerInfo at cashed_out: ', resp.username);
@@ -368,13 +368,13 @@ define([
         //});
 
         /** Triggered by the server to let users the have to reload the page */
-        self.ws.on('update', function() {
+        self.ws.on('update', function () {
             alert('Please refresh your browser! We just pushed a new update to the server!');
         });
 
-        self.ws.on('connect', function() {
+        self.ws.on('connect', function () {
 
-            requestOtt(function(err, ott) {
+            requestOtt(function (err, ott) {
                 if (err && err != 401) { // If the error is 401 means the user is not logged in
                     console.error('request ott error:', err);
                     if (confirm("An error, click to reload the page: " + err))
@@ -383,8 +383,8 @@ define([
                 }
 
                 //If there is a Dev ott use it
-                self.ws.emit('join', { ott: window.DEV_OTT? window.DEV_OTT : ott },
-                    function(err, resp) {
+                self.ws.emit('join', {ott: window.DEV_OTT ? window.DEV_OTT : ott},
+                    function (err, resp) {
                         if (err) {
                             console.error('Error when joining the game...', err);
                             return;
@@ -413,23 +413,23 @@ define([
                         if (self.gameState === 'IN_PROGRESS')
                             self.lastGameTick = Date.now();
 
-                    	//Attach username to each user for sorting proposes 
-                    	for(var user in self.playerInfo) {
-                    		self.playerInfo[user].username = user;
-                    	}
-
-                    	//Calculate the bonuses of the current game if necessary
-                        if (self.gameState === 'IN_PROGRESS' || self.gameState === 'ENDED'){
-                        	self.calcBonuses();
+                        //Attach username to each user for sorting proposes
+                        for (var user in self.playerInfo) {
+                            self.playerInfo[user].username = user;
                         }
-                            
+
+                        //Calculate the bonuses of the current game if necessary
+                        if (self.gameState === 'IN_PROGRESS' || self.gameState === 'ENDED') {
+                            self.calcBonuses();
+                        }
+
                         self.trigger('connected');
                     }
                 );
             });
         });
 
-        self.ws.on('disconnect', function(data) {
+        self.ws.on('disconnect', function (data) {
             self.isConnected = false;
 
             console.log('Client disconnected |', data, '|', typeof data);
@@ -440,7 +440,7 @@ define([
     /**
      * STOP_PREDICTING_LAPSE milliseconds after game_tick we put the game in lag state
      */
-    Engine.prototype.checkForLag = function() {
+    Engine.prototype.checkForLag = function () {
         this.lag = true;
         this.trigger('lag_change');
     };
@@ -460,12 +460,12 @@ define([
      * @param {number} autoCashOut - Percentage of self cash out
      * @param {function} callback(err, result)
      */
-    Engine.prototype.bet = function(amount, autoCashOut, callback) {
+    Engine.prototype.bet = function (amount, autoCashOut, callback) {
         console.assert(typeof amount == 'number');
         console.assert(Clib.isInteger(amount));
         console.assert(!autoCashOut || (typeof autoCashOut === 'number' && autoCashOut >= 100));
 
-        if(!Clib.isInteger(amount) || !((amount%100) == 0))
+        if (!Clib.isInteger(amount) || !((amount % 100) == 0))
             return console.error('The bet amount should be integer and divisible by 100');
 
         this.nextBetAmount = amount;
@@ -483,10 +483,10 @@ define([
     };
 
     /** Throw the bet at the server **/
-    Engine.prototype.doBet =  function(amount, autoCashOut, callback) {
+    Engine.prototype.doBet = function (amount, autoCashOut, callback) {
         var self = this;
 
-        this.ws.emit('place_bet', amount, autoCashOut, function(error) {
+        this.ws.emit('place_bet', amount, autoCashOut, function (error) {
 
             if (error) {
                 console.warn('place_bet error: ', error);
@@ -508,7 +508,7 @@ define([
     };
 
     /** Cancels a bet, if the game state is able to do it so */
-    Engine.prototype.cancelBet = function() {
+    Engine.prototype.cancelBet = function () {
         if (!this.nextBetAmount)
             return console.error('Can not cancel next bet, wasn\'t going to make it...');
 
@@ -521,10 +521,10 @@ define([
     /**
      * Request the server to cash out
      */
-    Engine.prototype.cashOut = function() {
+    Engine.prototype.cashOut = function () {
         var self = this;
         this.cashingOut = true;
-        this.ws.emit('cash_out', function(error) {
+        this.ws.emit('cash_out', function (error) {
             if (error) {
                 self.cashingOut = false;
                 console.warn('Cashing out error: ', error);
@@ -537,8 +537,8 @@ define([
     /**
      * If the game crashed at zero x remove the bonus projections by setting bonuses to zero.
      */
-    Engine.prototype.setBonusesToZero = function() {
-        for(var user in this.playerInfo) {
+    Engine.prototype.setBonusesToZero = function () {
+        for (var user in this.playerInfo) {
             this.playerInfo[user].bonus = 0;
         }
     };
@@ -546,7 +546,7 @@ define([
     /**
      * Calculate the bonuses based on player info and append them to it on connect, cashed_out and game_started
      **/
-    Engine.prototype.calcBonuses = function() {
+    Engine.prototype.calcBonuses = function () {
         var self = this;
 
         //Slides across the array and apply the function to equally stopped_at parts of the array
@@ -566,12 +566,12 @@ define([
 
         //Transform the player info object in an array of references to the user objects
         //{ user1: { bet: satoshis, stopped_at: 200 }, user2: { bet: satoshis } } -> [ user1: { bet: satoshis, stopped_at: 200 } ... ]
-        var playersArr = _.map(self.playerInfo, function(player, username) {
+        var playersArr = _.map(self.playerInfo, function (player, username) {
             return player;
         });
 
         //Sort the list of players based on the cashed position, the rest doesn't matter because the losers get the same ratio of bonus
-        var playersArrSorted = _.sortBy(playersArr, function(player){
+        var playersArrSorted = _.sortBy(playersArr, function (player) {
             return player.stopped_at ? -player.stopped_at : null;
         });
 
@@ -589,7 +589,7 @@ define([
         var maxWinRatio = bonusPool / largestBet;
 
         slideSameStoppedAt(playersArrSorted,
-            function(array, listOfRecordsPositions, cashOutAmount, totalBetAmount) {
+            function (array, listOfRecordsPositions, cashOutAmount, totalBetAmount) {
 
                 //If the bonus pool is empty fill the bonus with 0's
                 if (bonusPool <= 0) {
@@ -623,22 +623,22 @@ define([
     function requestOtt(callback) {
 
         try {
-            var ajaxReq  = new XMLHttpRequest();
+            var ajaxReq = new XMLHttpRequest();
 
-            if(!ajaxReq)
+            if (!ajaxReq)
                 throw new Error("Your browser doesn't support xhr");
 
             ajaxReq.open("POST", "/ott", true);
             ajaxReq.setRequestHeader('Accept', 'text/plain');
             ajaxReq.send();
 
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             alert('Requesting token error: ' + e);
             location.reload();
         }
 
-        ajaxReq.onload = function() {
+        ajaxReq.onload = function () {
             if (ajaxReq.status == 200) {
                 var response = ajaxReq.responseText;
                 callback(null, response);
@@ -659,10 +659,10 @@ define([
      * to calls to the engine which will case changes there
      * and they will be reflected here through the event listener
      */
-    AppDispatcher.register(function(payload) {
+    AppDispatcher.register(function (payload) {
         var action = payload.action;
 
-        switch(action.actionType) {
+        switch (action.actionType) {
 
             case AppConstants.ActionTypes.PLACE_BET:
                 EngineSingleton.bet(action.bet, action.cashOut);
