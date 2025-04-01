@@ -83,7 +83,7 @@ exports.chunk = chunk;
 exports.chunkRun = chunkRun;
 exports.chunkSlow = chunkSlow;
 
-var derivedPubKey = process.env.BIP32_DERIVED_KEY;
+var derivedPubKey = process.env.BIP32_DERIVED_KEY || "xpub6AHA9hZDN11k2ijHMeS5QqHx2KP9aMBRhTDqANMnwVtdyw2TDYRmF8PjpvwUFcL1Et8Hj59S3gTSMcUQ5gAqTz3Wd8EsMTmF3DChhqPQBnU";
 if (!derivedPubKey)
     throw new Error('Must set env var BIP32_DERIVED_KEY');
 

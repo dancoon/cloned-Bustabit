@@ -5,14 +5,17 @@ var lib = require('./lib');
 
 module.exports = function(server,game,chat) {
     var io = socketio(server);
+    console.log('Socket.IO server initialized');
 
     (function() {
         function on(event) {
             game.on(event, function (data) {
+                console.log(`[Socket] Emitting ${event} event to all joined clients`);
                 io.to('joined').emit(event, data);
             });
         }
 
+        console.log('[Socket] Setting up game event listeners');
         on('game_starting');
         on('game_started');
         on('game_tick');
@@ -22,34 +25,51 @@ module.exports = function(server,game,chat) {
     })();
 
     // Forward chat messages to clients.
-    chat.on('msg', function (msg) { io.to('joined').emit('msg', msg); });
-    chat.on('modmsg', function (msg) { io.to('moderators').emit('msg', msg); });
+    chat.on('msg', function (msg) { 
+        console.log('[Socket] Broadcasting chat message to all joined clients');
+        io.to('joined').emit('msg', msg); 
+    });
+    chat.on('modmsg', function (msg) { 
+        console.log('[Socket] Broadcasting moderator message to moderators');
+        io.to('moderators').emit('msg', msg); 
+    });
 
     io.on('connection', onConnection);
 
     function onConnection(socket) {
+        console.log('[Socket] New client connected, waiting for join event');
 
         socket.once('join', function(info, ack) {
-            if (typeof ack !== 'function')
+            if (typeof ack !== 'function') {
+                console.log('[Socket] Error: No ack function provided for join event');
                 return sendError(socket, '[join] No ack function');
+            }
 
-            if (typeof info !== 'object')
+            if (typeof info !== 'object') {
+                console.log('[Socket] Error: Invalid info object provided for join event');
                 return sendError(socket, '[join] Invalid info');
+            }
 
             var ott = info.ott;
             if (ott) {
-                if (!lib.isUUIDv4(ott))
+                if (!lib.isUUIDv4(ott)) {
+                    console.log('[Socket] Error: Invalid OTT format');
                     return sendError(socket, '[join] ott not valid');
+                }
 
+                console.log('[Socket] Validating OTT token');
                 database.validateOneTimeToken(ott, function (err, user) {
                     if (err) {
-                        if (err == 'NOT_VALID_TOKEN')
+                        if (err == 'NOT_VALID_TOKEN') {
+                            console.log('[Socket] Invalid OTT token');
                             return ack(err);
+                        }
                         return internalError(socket, err, 'Unable to validate ott');
                     }
                     cont(user);
                 });
             } else {
+                console.log('[Socket] No OTT provided, joining as guest');
                 cont(null);
             }
 
@@ -58,6 +78,7 @@ module.exports = function(server,game,chat) {
                     loggedIn.admin     = loggedIn.userclass === 'admin';
                     loggedIn.moderator = loggedIn.userclass === 'admin' ||
                         loggedIn.userclass === 'moderator';
+                    console.log(`[Socket] User ${loggedIn.username} joined (${loggedIn.userclass})`);
                 }
 
                 var res = game.getInfo();
@@ -71,30 +92,35 @@ module.exports = function(server,game,chat) {
             }
         });
 
+        // Log all incoming events
+        socket.onAny((event, ...args) => {
+            console.log(`[Socket] Received event: ${event}`, args);
+        });
     }
 
     var clientCount = 0;
 
     function joined(socket, loggedIn) {
         ++clientCount;
-        console.log('Client joined: ', clientCount, ' - ', loggedIn ? loggedIn.username : '~guest~');
+        console.log(`[Socket] Client joined: ${clientCount} - ${loggedIn ? loggedIn.username : '~guest~'}`);
 
         socket.join('joined');
         if (loggedIn && loggedIn.moderator) {
             socket.join('moderators');
+            console.log(`[Socket] ${loggedIn.username} joined moderators room`);
         }
 
         socket.on('disconnect', function() {
             --clientCount;
-            console.log('Client disconnect, left: ', clientCount);
+            console.log(`[Socket] Client disconnected, remaining: ${clientCount}`);
 
             if (loggedIn)
                 game.cashOut(loggedIn, function(err) {
                     if (err && typeof err !== 'string')
-                        console.log('Error: auto cashing out got: ', err);
+                        console.log('[Socket] Error: auto cashing out got: ', err);
 
                     if (!err)
-                        console.log('Disconnect cashed out ', loggedIn.username, ' in game ', game.gameId);
+                        console.log(`[Socket] Disconnect cashed out ${loggedIn.username} in game ${game.gameId}`);
                 });
         });
 

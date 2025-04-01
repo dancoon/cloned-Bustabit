@@ -36,9 +36,17 @@ if (config.USE_HTTPS) {
     });
 }
 
+database.getLastGameInfo(function(err, results) {
+    console.log(results);
+    if (err) {
+        console.error('[INTERNAL_ERROR] got error: ', err,
+            'Unable to get table history');
+        throw err;
+    }
+});
+
 async.parallel([
     database.getGameHistory,
-    database.getLastGameInfo,
     database.getBankroll
 ], function(err, results) {
     if (err) {

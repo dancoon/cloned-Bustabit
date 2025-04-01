@@ -1,11 +1,11 @@
-var assert   =  require('assert');
-var CBuffer  =  require('CBuffer');
-var events   =  require('events');
-var util     =  require('util');
-var _        =  require('lodash');
+var assert = require('assert');
+var CBuffer = require('CBuffer');
+var events = require('events');
+var util = require('util');
+var _ = require('lodash');
 
-var db       =  require('./database');
-var lib      =  require('./lib');
+var db = require('./database');
+var lib = require('./lib');
 
 var CHAT_HISTORY_SIZE = 50;
 
@@ -15,7 +15,7 @@ function Chat() {
     // History of chat messages.
     self.chatTable = new CBuffer(CHAT_HISTORY_SIZE);
     // History of mod only messages.
-    self.modTable  = new CBuffer(CHAT_HISTORY_SIZE);
+    self.modTable = new CBuffer(CHAT_HISTORY_SIZE);
 
     /*
       Collection of muted users.
@@ -49,16 +49,16 @@ Chat.prototype.getHistory = function (userInfo) {
     return history;
 };
 
-Chat.prototype.say = function(socket, userInfo, message) {
+Chat.prototype.say = function (socket, userInfo, message) {
     var self = this;
     var now = new Date();
 
     var msg = {
-        time:      now,
-        type:      'say',
-        username:  userInfo.username,
-        role:      userInfo.userclass,
-        message:   message
+        time: now,
+        type: 'say',
+        username: userInfo.username,
+        role: userInfo.userclass,
+        message: message
     };
 
     if (lib.hasOwnProperty(self.muted, userInfo.username)) {
@@ -74,12 +74,13 @@ Chat.prototype.say = function(socket, userInfo, message) {
         } else {
             // Inform the user that he is still muted.
             socket.emit('msg',
-                        { time: now,
-                          type: 'info',
-                          message: 'You\'re muted. ' +
-                            lib.printTimeString(muted.end - now) +
-                            ' remaining'
-                        });
+                {
+                    time: now,
+                    type: 'info',
+                    message: 'You\'re muted. ' +
+                        lib.printTimeString(muted.end - now) +
+                        ' remaining'
+                });
             return;
         }
     }
@@ -88,14 +89,14 @@ Chat.prototype.say = function(socket, userInfo, message) {
     self.emit('msg', msg);
 };
 
-Chat.prototype.mute = function(shadow, moderatorInfo, username, time, callback) {
+Chat.prototype.mute = function (shadow, moderatorInfo, username, time, callback) {
     var self = this;
     var now = new Date();
-    var ms  = lib.parseTimeString(time);
+    var ms = lib.parseTimeString(time);
     var end = new Date(Date.now() + ms);
 
     // Query the db to make sure that the username exists.
-    db.getUserByName(username, function(err, userInfo) {
+    db.getUserByName(username, function (err, userInfo) {
 
         if (err) {
             callback(err);
@@ -110,20 +111,21 @@ Chat.prototype.mute = function(shadow, moderatorInfo, username, time, callback) 
 
         // Overriding previous mutes.
         self.muted[userInfo.username] =
-            { time:        now,
-              moderator:   moderatorInfo.username,
-              timespec:    time,
-              end:         end,
-              shadow:      shadow
+            {
+                time: now,
+                moderator: moderatorInfo.username,
+                timespec: time,
+                end: end,
+                shadow: shadow
             };
 
         var msg = {
-            time:        now,
-            type:        'mute',
-            moderator:   moderatorInfo.username,
-            username:    userInfo.username,
-            timespec:    time,
-            shadow:      shadow
+            time: now,
+            type: 'mute',
+            moderator: moderatorInfo.username,
+            username: userInfo.username,
+            timespec: time,
+            shadow: shadow
         };
 
         if (shadow) {
@@ -137,7 +139,7 @@ Chat.prototype.mute = function(shadow, moderatorInfo, username, time, callback) 
     });
 };
 
-Chat.prototype.unmute = function(moderatorInfo, username, callback) {
+Chat.prototype.unmute = function (moderatorInfo, username, callback) {
     var self = this;
     var now = new Date();
 
@@ -148,11 +150,11 @@ Chat.prototype.unmute = function(moderatorInfo, username, callback) {
     delete self.muted[username];
 
     var msg = {
-        time:      now,
-        type:      'unmute',
+        time: now,
+        type: 'unmute',
         moderator: moderatorInfo.username,
-        username:  username,
-        shadow:    shadow
+        username: username,
+        shadow: shadow
     };
 
     if (shadow) {

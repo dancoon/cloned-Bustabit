@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="PostgreSQL" uuid="c8b8776d-53e7-4ebc-954e-f8d4fbb4fd5c">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>postgresql://rubani-clone_owner:npg_i6hMgHxem2sP@ep-dark-king-a5viux15-pooler.us-east-2.aws.neon.tech/rubani-clone?sslmode=require</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="rubani-clone@ep-dark-king-a5viux15-pooler.us-east-2.aws.neon.tech" uuid="60daec7a-0d5d-4230-b9f7-6981061c4149">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ep-dark-king-a5viux15-pooler.us-east-2.aws.neon.tech/rubani-clone</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>

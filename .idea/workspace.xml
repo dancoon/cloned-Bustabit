@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4114a801-99b1-4337-9d2f-6077db84db63" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/depositor/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gameserver/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webserver/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webserver/build-config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/depositor/src/lib.js" beforeDir="false" afterPath="$PROJECT_DIR$/depositor/src/lib.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gameserver/server/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/gameserver/server/chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gameserver/server/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/gameserver/server/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gameserver/server/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/gameserver/server/database.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/client_new/scripts/game-logic/engine.js" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/client_new/scripts/game-logic/engine.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/client_new/scripts/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/client_new/scripts/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/client_old/scripts/constants/AppConstants.js" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/client_old/scripts/constants/AppConstants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/client_old/scripts/game-logic/engine.js" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/client_old/scripts/game-logic/engine.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/config/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/config/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;dancoon&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/dancoon/cloned-Bustabit&quot;,
+    &quot;accountId&quot;: &quot;7e104f6d-3a9a-4477-b3f2-cc071b202683&quot;
+  }
+}</component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/gameserver/package.json" />
+    <dismissed value="$PROJECT_DIR$/package.json" />
+    <dismissed value="$PROJECT_DIR$/webserver/package.json" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2v35Y8I7lUOfe7U62zvGsCOD8NN" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.docker-compose.yml.postgres: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.webserver: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.gameserver/Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.webserver/Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;database.query.execution&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.3.2.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
+  }
+}</component>
+  <component name="RunManager" selected="Docker.webserver/Dockerfile">
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="postgres" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.webserver: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="webserver" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="gameserver/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="containerName" value="" />
+          <option name="sourceFilePath" value="gameserver/Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="webserver/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="sourceFilePath" value="webserver/Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.webserver/Dockerfile" />
+        <item itemvalue="Docker.docker-compose.yml.webserver: Compose Deployment" />
+        <item itemvalue="Docker.gameserver/Dockerfile" />
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+        <item itemvalue="Docker.docker-compose.yml.postgres: Compose Deployment" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.26053.12" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4114a801-99b1-4337-9d2f-6077db84db63" name="Changes" comment="" />
+      <created>1743360963471</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1743360963471</updated>
+      <workItem from="1743360966833" duration="570000" />
+      <workItem from="1743362757876" duration="5396000" />
+      <workItem from="1743369294898" duration="1037000" />
+      <workItem from="1743370778621" duration="4579000" />
+      <workItem from="1743383429215" duration="845000" />
+      <workItem from="1743384638666" duration="3934000" />
+      <workItem from="1743389015208" duration="659000" />
+      <workItem from="1743408937818" duration="4257000" />
+      <workItem from="1743447368765" duration="7105000" />
+      <workItem from="1743497540689" duration="9602000" />
+      <workItem from="1743530637583" duration="1741000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

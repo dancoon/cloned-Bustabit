@@ -1,0 +1,85 @@
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:13
+    container_name: bustabit-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bustabit
+      POSTGRES_PASSWORD: bustabitpass
+      POSTGRES_DB: bustabit
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Redis for caching and session management
+  redis:
+    image: redis:6
+    container_name: bustabit-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  # 1. Depositor module
+  depositor:
+    build:
+      context: .
+      dockerfile: ./depositor/Dockerfile
+    container_name: bustabit-depositor
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://bustabit:bustabitpass@postgres:5432/bustabit
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    command: ["npm", "start"]
+
+  # 2. Game module
+  game:
+    build:
+      context: .
+      dockerfile: ./gameserver/Dockerfile
+    container_name: bustabit-game
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://bustabit:bustabitpass@postgres:5432/bustabit
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    command: ["npm", "start"]
+
+  # 3. Web server
+  webserver:
+    build:
+      context: .
+      dockerfile: ./webserver/Dockerfile
+    container_name: bustabit-webserver
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - game
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://bustabit:bustabitpass@postgres:5432/bustabit
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3841:3841"
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    command: ["npm", "start"]
+
+volumes:
+  postgres_data:
