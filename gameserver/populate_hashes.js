@@ -5,7 +5,7 @@ var _ = require('lodash');
 
 var offset = 1e6;
 
-var games = 1e6;  // You might want to make this 10M for a prod setting..
+var games = 20;  // You might want to make this 10M for a prod setting..
 var game = games;
 var serverSeed = 'DO NOT USE THIS SEED';
 

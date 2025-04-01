@@ -9,5 +9,5 @@ module.exports = {
     PRODUCTION: process.env.NODE_ENV  === 'production',
     //Do not set any of this on production
 
-    CRASH_AT: process.env.CRASH_AT || 300  //TODO: Change after consultation Force the crash point
+    CRASH_AT: process.env.CRASH_AT || 3  //TODO: Change after consultation Force the crash point
 };

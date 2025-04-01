@@ -4,7 +4,9 @@ var database = require('./database');
 var lib = require('./lib');
 
 module.exports = function(server,game,chat) {
-    var io = socketio(server);
+    var io = socketio(server, {
+        cors: { origin: "*" },
+      });
     console.log('Socket.IO server initialized');
 
     (function() {

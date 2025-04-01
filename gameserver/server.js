@@ -36,38 +36,38 @@ if (config.USE_HTTPS) {
     });
 }
 
-database.getLastGameInfo(function(err, results) {
-    console.log(results);
-    if (err) {
-        console.error('[INTERNAL_ERROR] got error: ', err,
-            'Unable to get table history');
+// Initialize game server
+async function initializeGameServer() {
+    try {
+        // Get last game info
+        const lastGameInfo = await database.getLastGameInfo();
+        console.log('Last game info:', lastGameInfo);
+
+        // Get game history and bankroll in parallel
+        const [gameHistory, bankroll] = await Promise.all([
+            database.getGameHistory(),
+            database.getBankroll()
+        ]);
+
+        console.log('Have a bankroll of: ', bankroll/1e8, ' btc');
+
+        const lastGameId = lastGameInfo.id;
+        const lastHash = lastGameInfo.hash;
+        assert(typeof lastGameId === 'number');
+
+        const gameHistoryInstance = new GameHistory(gameHistory);
+        const game = new Game(lastGameId, lastHash, bankroll, gameHistoryInstance);
+        const chat = new Chat();
+
+        socket(server, game, chat);
+    } catch (err) {
+        console.error('[INTERNAL_ERROR] Failed to initialize game server:', err);
         throw err;
     }
-});
+}
 
-async.parallel([
-    database.getGameHistory,
-    database.getBankroll
-], function(err, results) {
-    if (err) {
-        console.error('[INTERNAL_ERROR] got error: ', err,
-            'Unable to get table history');
-        throw err;
-    }
-
-    var gameHistory = new GameHistory(results[0]);
-    var info = results[1];
-    var bankroll = results[2];
-
-    console.log('Have a bankroll of: ', bankroll/1e8, ' btc');
-
-    var lastGameId = info.id;
-    var lastHash = info.hash;
-    assert(typeof lastGameId === 'number');
-
-    var game = new Game(lastGameId, lastHash, bankroll, gameHistory);
-    var chat = new Chat();
-
-    socket(server, game, chat);
-
+// Start the game server
+initializeGameServer().catch(err => {
+    console.error('Failed to start game server:', err);
+    process.exit(1);
 });

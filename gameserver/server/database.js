@@ -1,9 +1,9 @@
-const assert = require('assert');
-const uuid = require('uuid');
-const async = require('async');
-const lib = require('./lib');
-const { Client, types } = require('pg');
-const config = require('./config');
+var assert = require('assert');
+var uuid = require('uuid');
+var async = require('async');
+var lib = require('./lib');
+var { Pool, types } = require('pg');
+var config = require('./config');
 
 // Ensure DATABASE_URL environment variable is set
 if (!config.DATABASE_URL)
@@ -11,89 +11,128 @@ if (!config.DATABASE_URL)
 
 console.log('DATABASE_URL: ', config.DATABASE_URL);
 
-// Parse DATABASE_URL to get connection parameters
-const dbUrl = new URL(config.DATABASE_URL);
 // Configure database connection parameters
 const dbConfig = {
-    user: "rubani-clone_owner",
-    password: "npg_i6hMgHxem2sP",
-    host: "ep-dark-king-a5viux15-pooler.us-east-2.aws.neon.tech",
-    port: 5432,
-    database: "rubani-clone", // Remove leading slash
+    connectionString: config.DATABASE_URL,
     ssl: {
         rejectUnauthorized: true,
         require: true
     },
-    poolSize: 20,
-    poolIdleTimeout: 120000
+    max: 5, // Reduced to prevent overwhelming the pooler
+    idleTimeoutMillis: 10000, // Reduced to prevent stale connections
+    connectionTimeoutMillis: 10000, // Increased to give more time for connection
+    statement_timeout: 30000, // 30 second statement timeout
+    query_timeout: 30000, // 30 second query timeout
+    application_name: 'moneypot_game_server', // Helps with connection tracking
+    keepalive: true, // Enable TCP keepalive
+    keepaliveInitialDelayMillis: 10000, // Initial delay before sending keepalive
+    keepaliveIntervalMillis: 10000, // Interval between keepalive packets
+    keepaliveCount: 3 // Number of keepalive packets to send before giving up
 };
 
 // Configure type parsers for PostgreSQL
-const configureTypeParsers = () => {
-    types.setTypeParser(20, val => val === null ? null : parseInt(val)); // int8 -> integer
-    types.setTypeParser(1700, val => val === null ? null : parseFloat(val)); // numeric -> float
-};
+types.setTypeParser(20, val => val === null ? null : parseInt(val)); // int8 -> integer
+types.setTypeParser(1700, val => val === null ? null : parseFloat(val)); // numeric -> float
 
-// Database connection management
+// Create the pool
+const pool = new Pool(dbConfig);
+
+// Handle pool errors
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+    // Don't exit process on pool error, just log it
+    console.error('Pool error:', err);
+});
+
+// Database operations class
 class Database {
     constructor() {
-        configureTypeParsers();
+        this.pool = pool;
+        this.maxRetries = 5; // Increased from 3 to 5
+        this.retryDelay = 2000; // Increased from 1000 to 2000ms
     }
 
-    // Create a new database connection
-    async connect() {
-        const client = new Client(dbConfig);
-        
-        try {
-            await client.connect();
-            console.log('Database connection established successfully');
-            return client;
-        } catch (err) {
-            console.error('Failed to connect to database:', {
-                error: err.message,
-                code: err.code,
-                stack: err.stack,
-                databaseUrl: config.DATABASE_URL?.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')
-            });
-            throw err;
-        }
-    }
-
-    // Execute a query with optional parameters
+    // Execute a query with optional parameters and retry logic
     async query(sql, params = []) {
-        const client = await this.connect();
-        try {
-            const result = await client.query(sql, params);
-            return result;
-        } catch (err) {
-            if (err.code === '40P01') {
-                console.log('Warning: Retrying deadlocked transaction:', sql, params);
-                return this.query(sql, params);
+        let lastError;
+        
+        for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+            const client = await this.pool.connect();
+            try {
+                const result = await client.query(sql, params);
+                client.release();
+                return result;
+            } catch (err) {
+                client.release();
+                lastError = err;
+                
+                // If it's a deadlock, retry immediately
+                if (err.code === '40P01') {
+                    console.log(`Warning: Retrying deadlocked transaction (attempt ${attempt}/${this.maxRetries}):`, sql);
+                    continue;
+                }
+                
+                // If it's a connection error, wait before retrying
+                if (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_CONNECTION_LOST' || err.message.includes('timeout')) {
+                    console.log(`Warning: Connection error (attempt ${attempt}/${this.maxRetries}), retrying in ${this.retryDelay}ms:`, err.message);
+                    await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+                    continue;
+                }
+                
+                // For other errors, throw immediately
+                throw err;
             }
-            throw err;
-        } finally {
-            await client.end();
         }
+        
+        throw lastError;
     }
 
-    // Execute a transaction
+    // Execute a transaction with retry logic
     async transaction(callback) {
-        const client = await this.connect();
-        try {
-            await client.query('BEGIN');
-            const result = await callback(client);
-            await client.query('COMMIT');
-            return result;
-        } catch (err) {
-            await client.query('ROLLBACK');
-            if (err.code === '40P01') {
-                console.log('Warning: Retrying deadlocked transaction');
-                return this.transaction(callback);
+        let lastError;
+        
+        for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+            const client = await this.pool.connect();
+            try {
+                await client.query('BEGIN');
+                const result = await callback(client);
+                await client.query('COMMIT');
+                client.release();
+                return result;
+            } catch (err) {
+                await client.query('ROLLBACK');
+                client.release();
+                lastError = err;
+                
+                // If it's a deadlock, retry immediately
+                if (err.code === '40P01') {
+                    console.log(`Warning: Retrying deadlocked transaction (attempt ${attempt}/${this.maxRetries})`);
+                    continue;
+                }
+                
+                // If it's a connection error, wait before retrying
+                if (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_CONNECTION_LOST') {
+                    console.log(`Warning: Connection error (attempt ${attempt}/${this.maxRetries}), retrying in ${this.retryDelay}ms:`, err.message);
+                    await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+                    continue;
+                }
+                
+                // For other errors, throw immediately
+                throw err;
             }
-            throw err;
-        } finally {
-            await client.end();
         }
+        
+        throw lastError;
+    }
+
+    // Get a client from the pool for custom operations
+    async getClient() {
+        return await this.pool.connect();
+    }
+
+    // End the pool
+    async end() {
+        await this.pool.end();
     }
 }
 
@@ -117,7 +156,8 @@ const gameQueries = {
         return { id, hash: hashResult.rows[0].hash };
     },
 
-    async createGame(gameId) {
+    async createGame(gameId ) {
+        console.log('gameId', gameId);
         const result = await db.query('SELECT hash FROM game_hashes WHERE game_id = $1', [gameId]);
         
         if (result.rows.length !== 1) {
@@ -291,5 +331,6 @@ module.exports = {
     ...gameQueries,
     ...userQueries,
     query: db.query.bind(db),
-    transaction: db.transaction.bind(db)
+    transaction: db.transaction.bind(db),
+    end: db.end.bind(db) // Add this to properly close the pool when shutting down
 };
